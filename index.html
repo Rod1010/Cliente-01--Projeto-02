@@ -1,58 +1,92 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gerador de Senhas Seguras</title>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gerador de Senhas — Console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>🔐 Gerador de Senhas</h1>
-        
-        <div class="password-display">
-            <input type="text" id="password" readonly>
-            <button id="copy-btn" class="copy-button">
-                📋 Copiar
-            </button>
-        </div>
+  <div class="console">
 
-        <div class="strength-meter">
-            <div class="strength-bar" id="strength-bar"></div>
-        </div>
-        <p class="strength-text" id="strength-text">Média</p>
+    <header class="console-head">
+      <span class="dot"></span>
+      <span class="head-label">gerador.de.senhas</span>
+      <span class="head-id">v2</span>
+    </header>
 
-        <div class="options">
-            <label>
-                <input type="range" id="length" min="8" max="32" value="16">
-                <span>Comprimento: <strong id="length-value">16</strong></span>
-            </label>
+    <main class="panel">
 
-            <div class="checkbox-group">
-                <label>
-                    <input type="checkbox" id="uppercase" checked> 
-                    Maiúsculas (ABC)
-                </label>
-                <label>
-                    <input type="checkbox" id="lowercase" checked> 
-                    Minúsculas (abc)
-                </label>
-                <label>
-                    <input type="checkbox" id="numbers" checked> 
-                    Números (123)
-                </label>
-                <label>
-                    <input type="checkbox" id="symbols" checked> 
-                    Símbolos (!@#)
-                </label>
-            </div>
-        </div>
-
-        <button id="generate-btn" class="generate-button">
-            Gerar Senha
+      <div class="eyebrow">saída</div>
+      <div class="readout">
+        <span id="password" class="readout-text" aria-live="polite"></span>
+        <button id="copy-btn" class="icon-btn" aria-label="Copiar senha" title="Copiar">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="8" y="8" width="12" height="12" rx="1.5"/><path d="M5 16H4.5A1.5 1.5 0 0 1 3 14.5v-10A1.5 1.5 0 0 1 4.5 3h10A1.5 1.5 0 0 1 16 4.5V5"/></svg>
         </button>
-    </div>
+      </div>
 
-    <script src="script.js"></script>
+      <div class="entropy-row">
+        <div class="entropy-track" aria-hidden="true">
+          <div class="entropy-fill" id="entropy-fill"></div>
+          <div class="entropy-ticks">
+            <span style="left:28%"></span>
+            <span style="left:56%"></span>
+            <span style="left:84%"></span>
+          </div>
+        </div>
+        <div class="entropy-readout">
+          <span id="entropy-bits">0</span><span class="entropy-unit">bits</span>
+          <span class="entropy-label" id="entropy-label">—</span>
+        </div>
+      </div>
+
+      <div class="divider" aria-hidden="true"></div>
+
+      <div class="field-row">
+        <label class="field-label" for="length">comprimento</label>
+        <input type="range" id="length" min="8" max="32" value="16" step="1">
+        <span class="field-value" id="length-value">16</span>
+      </div>
+
+      <div class="toggle-grid">
+        <label class="toggle">
+          <input type="checkbox" id="uppercase" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">A–Z<small>maiúsculas</small></span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="lowercase" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">a–z<small>minúsculas</small></span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="numbers" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">0–9<small>números</small></span>
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="symbols" checked>
+          <span class="toggle-box"></span>
+          <span class="toggle-text">#!%<small>símbolos</small></span>
+        </label>
+      </div>
+
+      <button id="generate-btn" class="generate-btn">
+        <span>Gerar nova senha</span>
+        <kbd>⏎</kbd>
+      </button>
+
+    </main>
+
+    <footer class="console-foot">
+      gerado localmente · crypto.getRandomValues
+    </footer>
+
+  </div>
+
+<script src="script.js"></script>
 </body>
 </html>

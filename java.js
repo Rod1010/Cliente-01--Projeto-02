@@ -1,104 +1,144 @@
-const passwordInput = document.getElementById('password');
+const passwordEl = document.getElementById('password');
 const lengthSlider = document.getElementById('length');
 const lengthValue = document.getElementById('length-value');
 const generateBtn = document.getElementById('generate-btn');
 const copyBtn = document.getElementById('copy-btn');
-
 const uppercaseCheck = document.getElementById('uppercase');
 const lowercaseCheck = document.getElementById('lowercase');
 const numbersCheck = document.getElementById('numbers');
 const symbolsCheck = document.getElementById('symbols');
+const entropyFill = document.getElementById('entropy-fill');
+const entropyBits = document.getElementById('entropy-bits');
+const entropyLabel = document.getElementById('entropy-label');
 
-const strengthBar = document.getElementById('strength-bar');
-const strengthText = document.getElementById('strength-text');
+const SETS = {
+  upper: 'ABCDEFGHJKLMNPQRSTUVWXYZ',
+  lower: 'abcdefghijkmnopqrstuvwxyz',
+  numbers: '23456789',
+  symbols: '!@#$%^&*-_=+?'
+};
 
-// Atualiza valor do slider
+let currentPassword = '';
+let scrambleTimer = null;
+
 lengthSlider.addEventListener('input', () => {
-    lengthValue.textContent = lengthSlider.value;
+  lengthValue.textContent = lengthSlider.value;
 });
 
-// Gera senha
+[uppercaseCheck, lowercaseCheck, numbersCheck, symbolsCheck].forEach(el =>
+  el.addEventListener('change', generatePassword)
+);
+lengthSlider.addEventListener('change', generatePassword);
+
+function secureRandomIndex(max) {
+  const range = 256 - (256 % max);
+  let byte;
+  do {
+    byte = crypto.getRandomValues(new Uint8Array(1))[0];
+  } while (byte >= range);
+  return byte % max;
+}
+
+function pickFrom(str) {
+  return str[secureRandomIndex(str.length)];
+}
+
+function shuffle(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = secureRandomIndex(i + 1);
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 function generatePassword() {
-    const length = parseInt(lengthSlider.value);
-    
-    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const lower = 'abcdefghijklmnopqrstuvwxyz';
-    const nums = '0123456789';
-    const syms = '!@#$%^&*()_+-=[]{}|;:,.<>/?';
+  const length = parseInt(lengthSlider.value, 10);
+  const active = [];
+  if (uppercaseCheck.checked) active.push(SETS.upper);
+  if (lowercaseCheck.checked) active.push(SETS.lower);
+  if (numbersCheck.checked) active.push(SETS.numbers);
+  if (symbolsCheck.checked) active.push(SETS.symbols);
 
-    let chars = '';
-    if (uppercaseCheck.checked) chars += upper;
-    if (lowercaseCheck.checked) chars += lower;
-    if (numbersCheck.checked) chars += nums;
-    if (symbolsCheck.checked) chars += syms;
+  if (active.length === 0) {
+    lowercaseCheck.checked = true;
+    active.push(SETS.lower);
+  }
 
-    // Garante que pelo menos uma opção esteja ativa
-    if (chars === '') {
-        lowercaseCheck.checked = true;
-        chars = lower;
-    }
+  const pool = active.join('');
+  const chars = [];
 
-    let password = '';
-    const array = new Uint32Array(length);
-    crypto.getRandomValues(array);
+  active.forEach(set => chars.push(pickFrom(set)));
+  while (chars.length < length) {
+    chars.push(pickFrom(pool));
+  }
 
-    for (let i = 0; i < length; i++) {
-        password += chars[array[i] % chars.length];
-    }
-
-    passwordInput.value = password;
-    updateStrength(password);
+  currentPassword = shuffle(chars).slice(0, length).join('');
+  animateReveal(currentPassword);
+  updateEntropy(length, pool.length);
 }
 
-// Avalia força da senha
-function updateStrength(password) {
-    let score = 0;
-    
-    if (password.length >= 12) score++;
-    if (password.length >= 16) score++;
-    if (/[A-Z]/.test(password)) score++;
-    if (/[0-9]/.test(password)) score++;
-    if (/[^A-Za-z0-9]/.test(password)) score++;
-
-    let strength = 'Fraca';
-    let color = '#ff4444';
-
-    if (score >= 4) {
-        strength = 'Forte';
-        color = '#00ff9d';
-    } else if (score >= 3) {
-        strength = 'Média';
-        color = '#ffaa00';
+function animateReveal(target) {
+  clearInterval(scrambleTimer);
+  const scrambleChars = SETS.upper + SETS.lower + SETS.numbers + SETS.symbols;
+  const frames = 9;
+  let frame = 0;
+  scrambleTimer = setInterval(() => {
+    frame++;
+    let display = '';
+    for (let i = 0; i < target.length; i++) {
+      const settled = frame / frames > i / target.length;
+      display += settled ? target[i] : pickFrom(scrambleChars);
     }
-
-    strengthBar.style.width = `${(score / 5) * 100}%`;
-    strengthBar.style.background = color;
-    strengthText.textContent = strength;
-    strengthText.style.color = color;
+    passwordEl.textContent = display;
+    if (frame >= frames) {
+      clearInterval(scrambleTimer);
+      passwordEl.textContent = target;
+    }
+  }, 28);
 }
 
-// Copiar senha
+function updateEntropy(length, poolSize) {
+  const bits = Math.round(length * Math.log2(poolSize));
+  entropyBits.textContent = bits;
+
+  let pct, color, label;
+  if (bits < 40) {
+    pct = (bits / 40) * 28;
+    color = 'var(--weak)';
+    label = 'fraca';
+  } else if (bits < 60) {
+    pct = 28 + ((bits - 40) / 20) * 28;
+    color = 'var(--mid)';
+    label = 'razoável';
+  } else if (bits < 80) {
+    pct = 56 + ((bits - 60) / 20) * 28;
+    color = 'var(--mid)';
+    label = 'forte';
+  } else {
+    pct = 84 + Math.min(((bits - 80) / 40) * 16, 16);
+    color = 'var(--strong)';
+    label = 'muito forte';
+  }
+
+  entropyFill.style.width = `${Math.min(pct, 100)}%`;
+  entropyFill.style.background = color;
+  entropyLabel.textContent = label;
+}
+
 copyBtn.addEventListener('click', async () => {
-    if (!passwordInput.value) return;
-
-    try {
-        await navigator.clipboard.writeText(passwordInput.value);
-        
-        const originalText = copyBtn.textContent;
-        copyBtn.textContent = '✅ Copiado!';
-        copyBtn.style.background = '#00cc7a';
-        
-        setTimeout(() => {
-            copyBtn.textContent = originalText;
-            copyBtn.style.background = '';
-        }, 2000);
-    } catch (err) {
-        alert('Erro ao copiar senha');
-    }
+  if (!currentPassword) return;
+  try {
+    await navigator.clipboard.writeText(currentPassword);
+    copyBtn.classList.add('copied');
+    setTimeout(() => copyBtn.classList.remove('copied'), 1400);
+  } catch (err) {
+    console.error('Falha ao copiar', err);
+  }
 });
 
-// Gerar senha ao clicar no botão
 generateBtn.addEventListener('click', generatePassword);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') generatePassword();
+});
 
-// Gerar senha inicial
 generatePassword();
