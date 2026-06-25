@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gerador de senhas seguras com opções de comprimento e tipos de caracteres.">
+  <title>Gerador de Senhas Seguro</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="generator" aria-labelledby="app-title">
+      <div class="header">
+        <p class="eyebrow">Segurança simples</p>
+        <h1 id="app-title">Gerador de Senhas</h1>
+      </div>
+
+      <div class="password-panel" aria-live="polite">
+        <label class="sr-only" for="password-output">Senha gerada</label>
+        <input id="password-output" class="password-output" type="text" readonly value="" aria-label="Senha gerada">
+        <button id="copy-button" class="icon-button copy-button" type="button" aria-label="Copiar senha">
+          <span aria-hidden="true">Copiar</span>
+        </button>
+      </div>
+
+      <div class="strength" aria-label="Força da senha">
+        <div class="strength-topline">
+          <span>Força</span>
+          <strong id="strength-label">Forte</strong>
+        </div>
+        <div class="strength-track" aria-hidden="true">
+          <span id="strength-bar" class="strength-bar"></span>
+        </div>
+      </div>
+
+      <form class="controls" action="#" autocomplete="off">
+        <div class="control-group length-control">
+          <div class="control-heading">
+            <label for="length-slider">Comprimento</label>
+            <output id="length-value" for="length-slider">16</output>
+          </div>
+          <input id="length-slider" type="range" min="8" max="32" value="16">
+        </div>
+
+        <fieldset class="control-group options">
+          <legend>Incluir caracteres</legend>
+          <label class="checkbox-row">
+            <input id="uppercase" type="checkbox" checked>
+            <span>Maiúsculas</span>
+          </label>
+          <label class="checkbox-row">
+            <input id="lowercase" type="checkbox" checked>
+            <span>Minúsculas</span>
+          </label>
+          <label class="checkbox-row">
+            <input id="numbers" type="checkbox" checked>
+            <span>Números</span>
+          </label>
+          <label class="checkbox-row">
+            <input id="symbols" type="checkbox" checked>
+            <span>Símbolos</span>
+          </label>
+        </fieldset>
+
+        <button id="generate-button" class="primary-button" type="button">Gerar nova senha</button>
+      </form>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
