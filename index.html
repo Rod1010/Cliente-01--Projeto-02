@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerador de Senhas Seguras</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Gerador de Senhas</h1>
+        
+        <div class="password-display">
+            <input type="text" id="password" readonly>
+            <button id="copy-btn" class="copy-button">
+                📋 Copiar
+            </button>
+        </div>
+
+        <div class="strength-meter">
+            <div class="strength-bar" id="strength-bar"></div>
+        </div>
+        <p class="strength-text" id="strength-text">Média</p>
+
+        <div class="options">
+            <label>
+                <input type="range" id="length" min="8" max="32" value="16">
+                <span>Comprimento: <strong id="length-value">16</strong></span>
+            </label>
+
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="uppercase" checked> 
+                    Maiúsculas (ABC)
+                </label>
+                <label>
+                    <input type="checkbox" id="lowercase" checked> 
+                    Minúsculas (abc)
+                </label>
+                <label>
+                    <input type="checkbox" id="numbers" checked> 
+                    Números (123)
+                </label>
+                <label>
+                    <input type="checkbox" id="symbols" checked> 
+                    Símbolos (!@#)
+                </label>
+            </div>
+        </div>
+
+        <button id="generate-btn" class="generate-button">
+            Gerar Senha
+        </button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
